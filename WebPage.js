@@ -7,9 +7,9 @@ function initOptions(o) {
   //   o.addArguments("headless");
   o.addArguments("disable-infobars");
   o.addArguments("no-sandbox");
-  o.addArguments(
-    "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36 RuxitSynthetic/1.0 v6419931773 t38550 ath9b965f92 altpub"
-  );
+  // o.addArguments(
+  //   "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36 RuxitSynthetic/1.0 v6419931773 t38550 ath9b965f92 altpub"
+  // );
   o.setUserPreferences({
     credential_enable_service: false,
   });
@@ -49,29 +49,59 @@ const BasePage = function (customAudio = null) {
   };
 
   this.signin = async function () {
-    let name = process.env.USERNAME || "";
-    let password = process.env.PASSWORD || "";
-    let input = await this.findById("session_key");
-    await input.sendKeys(name);
-    let input2 = await this.findById("session_password");
+    const empId = process.env.EMP_ID || "";
+    const password = process.env.PASSWORD || "";
+    const input = await this.findById("UserLogin_username");
+    await input.sendKeys(empId);
+    const input2 = await this.findById("UserLogin_password");
     await input2.sendKeys(password);
-    let button = await this.findByClassName(
-      "sign-in-form__submit-btn--full-width"
-    );
-    console.log(button);
+    const button = await this.findById("login-submit");
     await button.click();
   };
 
-  this.pressAcceptButton = async function () {
-    let buttons = await this.findByClassName(
-      "artdeco-button--secondary invitation-card__action-btn"
-    );
-    await buttons.click();
+  this.hoverClockInBtn = async function () {
+    const elem = await this.findByClassName("show_clock_popover pos-relative inline-block vertical-align-middle");
+    const clockInBtn = await this.findByClassName("tool_tip_btn");
+    await this.driver
+      .actions({ async: true })
+      .move({ origin: elem, duration: 2000 })
+      .perform();
+    await this.driver
+      .actions({ async: true })
+      .move({ origin: clockInBtn })
+      .perform();
+  }
+
+  this.pressClockInButton = async function () {
+    const elem = await this.findByClassName("show_clock_popover pos-relative inline-block vertical-align-middle");
+    const clockInBtn = await this.findByClassName("tool_tip_btn");
+    const clockInBtnText = await clockInBtn.getAttribute("innerText");
+    await this.hoverClockInBtn();
+
+    if(clockInBtnText !== "Clockout" || clockInBtnText === "Clockin") {
+      await this.driver
+        .actions({ async: true })
+        .move({ origin: elem })
+        .press()
+        .release()
+        .perform();
+
+      this.driver.executeScript("alert('Successfully Marked Attendance!')");
+    } else {
+      this.driver.executeScript("alert('Attendance Already Marked')");
+    }
+
   };
 
-  this.scrollToBottom = async function () {
-    this.driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-  };
+  this.reload = async function () {
+    await this.driver.navigate().refresh();
+  }
+
+  this.close = function () {
+    // await this.driver.close();
+    this.driver.quit();
+  }
+
 };
 
 module.exports = BasePage;
