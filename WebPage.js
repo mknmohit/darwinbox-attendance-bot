@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Builder, By, until } = require("selenium-webdriver");
-
 const chrome = require("selenium-webdriver/chrome");
+require('chromedriver');
 
 function initOptions(o) {
   //   o.addArguments("headless");
@@ -23,7 +23,9 @@ const BasePage = function (customAudio = null) {
     .withCapabilities({ acceptSslCerts: true, acceptInsecureCerts: true })
     .setChromeOptions(o)
     .forBrowser("chrome")
-    .build();
+    .build()
+
+  this.driver.manage().window().maximize();
 
   this.visit = async function (theUrl) {
     return await this.driver.get(theUrl);
@@ -86,19 +88,21 @@ const BasePage = function (customAudio = null) {
         .release()
         .perform();
 
-      this.driver.executeScript("alert('Successfully Marked Attendance!')");
+      await this.driver.executeScript("alert('Attendance Marked Successfully')");
     } else {
-      this.driver.executeScript("alert('Attendance Already Marked')");
+      await this.driver.executeScript("alert('Attendance Already Marked')");
     }
-
   };
+
+  this.closeAlert = async function () {
+    await this.driver.switchTo().alert().dismiss();
+  }
 
   this.reload = async function () {
     await this.driver.navigate().refresh();
   }
 
-  this.close = function () {
-    // await this.driver.close();
+  this.closeBrowser = function () {
     this.driver.quit();
   }
 
