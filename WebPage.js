@@ -4,7 +4,7 @@ const chrome = require("selenium-webdriver/chrome");
 require('chromedriver');
 
 function initOptions(o) {
-  //   o.addArguments("headless");
+  o.addArguments("headless");
   o.addArguments("disable-infobars");
   o.addArguments("no-sandbox");
   // o.addArguments(
@@ -96,7 +96,7 @@ const BasePage = function (customAudio = null) {
 
   this.closeAlert = async function () {
     await this.driver.switchTo().alert().dismiss();
-  }
+  } 
 
   this.reload = async function () {
     await this.driver.navigate().refresh();
