@@ -4,7 +4,7 @@ const chrome = require("selenium-webdriver/chrome");
 require('chromedriver');
 
 function initOptions(o) {
-  // o.addArguments("headless");
+  o.addArguments("headless");
   o.addArguments("disable-infobars");
   o.addArguments("no-sandbox");
   // o.addArguments(
