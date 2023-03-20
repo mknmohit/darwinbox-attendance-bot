@@ -32,6 +32,7 @@ async function startBot() {
     await page.closeBrowser();
   } catch(e) {
     console.error("error", e)
+    await page.closeBrowser();
   }
 }
 
